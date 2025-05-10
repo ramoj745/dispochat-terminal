@@ -1,6 +1,6 @@
-# DispoChat
+# DispoChat-Terminal
 
-DispoChat is a simple terminal-based messaging app built with Python and Socket.IO.  
+This is a simple terminal-based messaging app built with Python and Socket.IO, using my past project's API (DispoChat).
 It allows you to chat in real-time using your terminal, and it's compatible with the web version of the app.
 
 ## Features

@@ -9,23 +9,26 @@ It allows you to chat in real-time using your terminal, and it's compatible with
 - Supports joining rooms (with or without passwords)
 - Compatible with web-based chat users
 
-## Requirements (for source code)
+## Requirements (if running app.py)
 
 - `requests`
 - `socketio`
 - `colorama`
 
+Navigate to folder:
+```bash
+cd dispochat-terminal
+```
 Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 Running the App:
 ```bash
-cd dispochat-terminal
 python app.py
 ```
 Or run the distributable
 ```bash
-./dist/DispoChat.exe
+./dist/DispoChat-Terminal.exe
 ```
 

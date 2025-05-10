@@ -11,11 +11,6 @@ init()
 def clearLastLine():
     sys.stdout.write("\033[F\033[K")
 
-####### Colors #######
-
-BLUE = "\033[94m"
-RESET = "\033[0m"
-
 ####### Connection #######
 
 def pingServer(url, retries=10, delay=3):
@@ -24,12 +19,12 @@ def pingServer(url, retries=10, delay=3):
         try:
             response = requests.get(url, timeout=5)
             if response.status_code == 200:
-                print("Connected!")
+                print(f"{Fore.GREEN}Connected!{Style.RESET_ALL}")
                 return True
         except requests.RequestException:
-            print(f"Attempt {i+1}/{retries} failed. Retrying in {delay} seconds...")
+            print(f"{Fore.YELLOW}Attempt {i+1}/{retries} failed. Retrying in {delay} seconds...{Style.RESET_ALL}")
             time.sleep(delay)
-    print("Server did not respond after several attempts.")
+    print(f"{Fore.RED}Server did not respond after several attempts.{Style.RESET_ALL}")
     return False
 
 ####### Socket.io ########
@@ -43,7 +38,7 @@ if pingServer(backendURL): # check if backend is up
 @sio.on("loadMessages")
 def loadMessages(messages):
     for message in messages:
-        print("[Past Message]:", message['message'])
+        print(f"{Fore.CYAN}[Past Message]:{Style.RESET_ALL}", message['message'])
 
 @sio.on("newMessage")
 def newMessage(data):
@@ -53,7 +48,7 @@ def newMessage(data):
     if sender == sio.sid:
         print(f"{Fore.CYAN}You:{Style.RESET_ALL} {message}")
     else:
-        print(f"{sender}: {message}")
+        print(f"{Fore.YELLOW}{sender}:{Style.RESET_ALL} {message}")
 
 def sendMessage(message, roomId, senderId):
     payload = {
@@ -63,18 +58,18 @@ def sendMessage(message, roomId, senderId):
     }
     requests.post(f"{backendURL}/sendMessage", json=payload)
 
-
 def inputLoop(roomId, clientId, roomName):
-    print(f"\n----- You've entered {roomName} ------")
-    print("(Type 'exit' to leave)\n")
+    print(f"\n{Fore.MAGENTA}----- You've entered {roomName} ------{Style.RESET_ALL}")
+    print(f"(Type {Fore.RED}'exit'{Style.RESET_ALL} to leave)\n")
+
     while True:
         try:
             message = input("")
             if not message.strip():
-                print("Message cannot be blank.")
+                print(f"{Fore.RED}Message cannot be blank.{Style.RESET_ALL}")
                 continue  
             if message.lower() == "exit":
-                print("Exiting...")
+                print(f"\n{Fore.RED}Exiting...{Style.RESET_ALL}")
                 time.sleep(1.5)
                 sio.disconnect()
                 sys.exit(0)
@@ -130,13 +125,13 @@ def getRooms():
 
 def main():
         while True:
-            print("\n\nWelcome to DispoChat! This small project allows messaging through Python terminals instead of a web interface.\nThis app uses the API from my DispoChat web project.\n(You can still chat with web users!)\n")
-            print("1. Create Room")
-            print("2. Join Room")
-            print("3. Exit")
+            print(f"\n\n{Fore.CYAN}Welcome to DispoChat!{Style.RESET_ALL} This small project allows messaging through Python terminals instead of a web interface.\nThis app uses the API from my DispoChat web project.\n(You can still chat with web users!){Style.RESET_ALL}\n")
+            print(f"|{Fore.YELLOW}1{Style.RESET_ALL}| Create Room")
+            print(f"|{Fore.YELLOW}2{Style.RESET_ALL}| Join Room")
+            print(f"|{Fore.YELLOW}3{Style.RESET_ALL}| Exit")
             print()
 
-            choice = input("Choose an option [1-3]: ")
+            choice = input(f"{Fore.GREEN}Choose an option [1-3]: {Style.RESET_ALL}")
 
             if choice == "1":
                 roomName = input("Type a name for your new room: ")
@@ -147,17 +142,17 @@ def main():
 
             elif choice == "2":
                 roomsList = getRooms()
-                print("\nHere are the list of rooms that are currently active:")
+                print(f"\nHere are the list of rooms that are currently active:")
                 for i, rooms in enumerate(roomsList, start=1):
-                    print(f"{i}. {rooms['name']}")
+                    print(f"|{Fore.YELLOW}{i}{Style.RESET_ALL}| {rooms['name']}")
                 print()
                 try:
-                    choice = int(input(f"Choose an option [1-{len(roomsList)}]: "))
+                    choice = int(input(f"{Fore.GREEN}Choose an option [1-{len(roomsList)}]: {Style.RESET_ALL}"))
                     print()
 
                     if 1 <= choice <= len(roomsList):
                         selectedRoom = roomsList[choice - 1]
-                        print(f"You've selected {selectedRoom['name']}\n")
+                        print(f"You've selected the room: |{Fore.YELLOW}{selectedRoom['name']}{Style.RESET_ALL}|\n")
                         time.sleep(0.5)
                         
                         roomId = selectedRoom['_id']
@@ -169,7 +164,7 @@ def main():
                         while True:
                             if sio.connected:
                                 if response['isPasswordProtected']:
-                                    print("Room is password protected.")
+                                    print(f"{Fore.RED}Room is password protected.{Style.RESET_ALL}")
                                     password = input("Enter password: ")
 
                                     payload = { # modified payload from joinRoom function
@@ -184,7 +179,7 @@ def main():
                                     
                                     if jsonData.get('incorrectPassword'):
                                         print()
-                                        print(jsonData['message'])
+                                        print(f"{Fore.RED}{jsonData['message']}{Style.RESET_ALL}")
                                         continue
                                     else:
                                         sio.emit("joinRoom", roomId)
@@ -212,25 +207,15 @@ def main():
                             else:
                                 sys.exit(0)
                 except ValueError:
-                    print("Please enter a valid number.")
+                    print(f"{Fore.RED}Please enter a valid number.{Style.RESET_ALL}")
             elif choice == "3":
-                print("\nExiting...")
+                print(f"\n{Fore.RED}Exiting...{Style.RESET_ALL}")
                 time.sleep(1.5)
                 break
             else:
-                print("\nPlease enter a valid number.")
+                print(f"\n{Fore.RED}Please enter a valid number.{Style.RESET_ALL}")
                 continue
 
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-

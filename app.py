@@ -16,12 +16,29 @@ def clearLastLine():
 BLUE = "\033[94m"
 RESET = "\033[0m"
 
+####### Connection #######
+
+def pingServer(url, retries=10, delay=3):
+    print(f"Waiting for server at {url} to respond...")
+    for i in range(retries):
+        try:
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                print("Connected!")
+                return True
+        except requests.RequestException:
+            print(f"Attempt {i+1}/{retries} failed. Retrying in {delay} seconds...")
+            time.sleep(delay)
+    print("Server did not respond after several attempts.")
+    return False
+
 ####### Socket.io ########
 
 sio = socketio.Client()
 backendURL = "https://dispochat-react-be.onrender.com"
 
-sio.connect(backendURL) # socket server url
+if pingServer(backendURL): # check if backend is up
+    sio.connect(backendURL) 
 
 @sio.on("loadMessages")
 def loadMessages(messages):
@@ -197,7 +214,7 @@ def main():
                 except ValueError:
                     print("Please enter a valid number.")
             elif choice == "3":
-                print("Exiting...")
+                print("\nExiting...")
                 time.sleep(1.5)
                 break
             else:
